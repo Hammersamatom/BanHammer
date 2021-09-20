@@ -14,6 +14,13 @@ SPNT = 0                                        # Where to start in the Banlist
 # --------------------------------------------- End Settings -------------------------------------------------------
 
 
+# --------------------------------------------- Start Global Variables ---------------------------------------------
+
+twitchCon = ""
+
+# --------------------------------------------- End Global Variables ----------------------------------------------
+
+
 # --------------------------------------------- Start Init Function ------------------------------------------------
 
 # Check for the following lines
@@ -31,12 +38,12 @@ def initConfig():
             parameters = config.readlines()
     except IOError:
         print("Config file not found. Please make a new valid config.txt")
-        input("Press Enter to continue...")
+        input("Press Enter to exit...")
         sys.exit()
 
     if len(parameters) < 5:
         print("Incomplete config.txt file")
-        input("Press Enter to continue...")
+        input("Press Enter to exit...")
         sys.exit()
     for item in parameters:
         if paramCheckList[0] in item:
@@ -112,13 +119,18 @@ def get_message(msg):
     result = result.lstrip(':')
     return result
 
+def connect():
+    global twitchCon
+    twitchCon = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    twitchCon.connect((HOST, PORT))
+    send_pass(PASS)
+    send_nick(NICK)
+    join_channel(CHAN)
+
 # --------------------------------------------- End Helper Functions -----------------------------------------------
 
 
 # --------------------------------------------- Core Functions -----------------------------------------------------
-
-
-twitchCon = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 def main():
     # Initialization phase
@@ -133,17 +145,17 @@ def main():
             lines = file.readlines()
     except IOError:
         print("Banlist file not found.")
-        input("Press Enter to continue...")
+        input("Press Enter to exit...")
         sys.exit()
 
+    # Initialize connection
+    connect()
 
-    twitchCon.connect((HOST, PORT))
-
-    send_pass(PASS)
-    send_nick(NICK)
-    join_channel(CHAN)
-
+    # Set   data   variable to empty
     data = ""
+
+    # Print the number of lines detected
+    print("Number of people to ban: %s" % len(lines))
 
     while True:
         try:
@@ -183,17 +195,16 @@ def main():
             data = ""
         
         except socket.error:
-            print("ACTUAL Socket error / Report to Hammersamatom")
-            input("Press Enter to continue...")
-            sys.exit()
+            print("ACTUAL Socket error / Attempting to reconnect...")
+            connect()
 
         except socket.timeout:
             print("Socket timeout / Twitch kicked you off")      
-            input("Press Enter to continue...")
+            input("Press Enter to exit...")
 
         except KeyboardInterrupt:
             print("Qutting...")
-            input("Press Enter to continue...")
+            input("Press Enter to exit...")
             sys.exit() 
 
 
