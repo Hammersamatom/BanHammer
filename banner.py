@@ -127,6 +127,12 @@ def connect():
     send_nick(NICK)
     join_channel(CHAN)
 
+def disconnect():
+    global twitchCon
+    part_channel(CHAN)
+    twitchCon.shutdown()
+    twitchCon.close()
+
 # --------------------------------------------- End Helper Functions -----------------------------------------------
 
 
@@ -196,11 +202,14 @@ def main():
         
         except socket.error:
             print("ACTUAL Socket error / Attempting to reconnect...")
+            disconnect()
             connect()
 
         except socket.timeout:
             print("Socket timeout / Twitch kicked you off")      
+            disconnect()
             input("Press Enter to exit...")
+            connect()
 
         except KeyboardInterrupt:
             print("Qutting...")

@@ -1,2 +1,7 @@
 *.txt
 .vscode/
+__pycache__/
+build/
+dist/
+*.spec
+config.txt
