@@ -1,0 +1,5 @@
+CHANNEL=this_is_a_channel_name
+USER=ThisIsYourModeratorUsername
+OAUTH=oauth:hafh80vesee5urltfzsxkpv67cgcjo
+BANLIST=list.txt
+STARTPOINT=0
