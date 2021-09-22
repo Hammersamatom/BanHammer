@@ -4,6 +4,7 @@
 import re
 import socket
 import time
+import errno
 import sys
 
 # --------------------------------------------- Start Settings ----------------------------------------------------
@@ -52,22 +53,27 @@ def initConfig():
         if paramCheckList[0] in item:
             global CHAN
             CHAN = "#" + item.replace(paramCheckList[0], '')
+            CHAN = CHAN.lstrip()
             CHAN = CHAN.rstrip()
         if paramCheckList[1] in item:
             global NICK
             NICK = item.replace(paramCheckList[1], '')
+            NICK = NICK.lstrip()
             NICK = NICK.rstrip()
         if paramCheckList[2] in item:
             global PASS
             PASS = item.replace(paramCheckList[2], '')
+            PASS = PASS.lstrip()
             PASS = PASS.rstrip()
         if paramCheckList[3] in item:
             global BNLT
             BNLT = item.replace(paramCheckList[3], '')
+            BNLT = BNLT.lstrip()
             BNLT = BNLT.rstrip()
         if paramCheckList[4] in item:
             global SPNT
             SPNT = item.replace(paramCheckList[4], '')
+            SPNT = SPNT.lstrip()
             SPNT = SPNT.rstrip()
             SPNT = int(SPNT)
 
@@ -81,7 +87,13 @@ def send_pong(msg):
 
 
 def send_message(chan, msg):
-    twitchCon.send(bytes('PRIVMSG %s :%s\r\n' % (chan, msg), 'UTF-8'))
+    try:
+        twitchCon.send(bytes('PRIVMSG %s :%s\r\n' % (chan, msg), 'UTF-8'))
+    except socket.error as error:
+        if error.errno == errno.EPIPE:
+            print("Broken Pipe! Rate limit too high? Exiting to prevent timeout!")
+            input("Press Enter to exit...")
+            sys.exit()
 
 
 def send_nick(nick):
@@ -122,6 +134,7 @@ def get_message(msg):
     result = result.lstrip(':')
     return result
 
+
 def connect():
     global twitchCon
     twitchCon = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -130,11 +143,17 @@ def connect():
     send_nick(NICK)
     join_channel(CHAN)
 
+
 def disconnect():
     global twitchCon
     part_channel(CHAN)
-    twitchCon.shutdown()
     twitchCon.close()
+
+
+def reconnect():
+    disconnect()
+    time.sleep(1/4)
+    connect()
 
 # --------------------------------------------- End Helper Functions -----------------------------------------------
 
@@ -146,7 +165,7 @@ def main():
     initConfig()
 
     # Ignore all of this. Initial setup.
-    trueCount = SPNT
+    recentException = False
     count = SPNT
     lines = []
     try:
@@ -174,10 +193,14 @@ def main():
                 twitchCon.setblocking(True)
             except socket.error:
                 print("No new RECVed data")
-                trueCount += 1
+                recentException = True
             except socket.timeout:
                 print("Socket timeout")
-                
+            
+            if len(data) == 0 and recentException == False:
+                print("Booted, reconnecting...")
+                reconnect()
+
             data_split = re.split(r"[~\r\n]+", data)
 
             for line in data_split:
@@ -193,7 +216,7 @@ def main():
                         print(sender + ": " + message)
 
             if count < len(lines):
-                print(("[" + str(count) + "] [" + str(trueCount) + "] Sending ban for %s" % lines[count]).rstrip())
+                print(("[" + str(count) + "] Sending ban for %s" % lines[count]).rstrip())
                 send_message(CHAN, "/ban %s" % lines[count])
                 count += 1
                 time.sleep(2/5)
@@ -202,20 +225,21 @@ def main():
                 sys.exit()
 
             data = ""
+            recentException = False
         
         except socket.error:
-            print("ACTUAL Socket error / Attempting to reconnect...")
-            disconnect()
-            connect()
+            print("ACTUAL Socket error / Attempting to reconnect automatically...")
+            reconnect()
 
         except socket.timeout:
             print("Socket timeout / Twitch kicked you off")      
             disconnect()
-            input("Press Enter to exit...")
+            input("Press Enter to retry...")
             connect()
 
         except KeyboardInterrupt:
-            print("Qutting...")
+            print("\nQutting...")
+            disconnect()
             input("Press Enter to exit...")
             sys.exit() 
 
