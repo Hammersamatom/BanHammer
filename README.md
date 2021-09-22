@@ -87,3 +87,4 @@
 - If you ever need to stop the program prematurely, you can use the keyboard combination **Ctrl+C**
 - If you *do* need to stop the program and restart it later, the number in [ ] on the bottom left is the most recent ban
     - You can then set the ```config.txt``` line with ```STARTPOINT=``` to that number, and the program will pick up where it left off. This will be automatic in the future
+- Sometimes, Twitch won't send messaging in a streamer's chat if this program is running. This only happens when you use the same Moderator account for both this program, and active chatting
