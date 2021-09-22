@@ -4,6 +4,7 @@
 * Windows Defender and other Anti-Virus software ***WILL*** mark ```BanHammer.exe``` as a virus
 	* This project uses ```PyInstaller``` to make the executable file ```BanHammer.exe```
 	* In the ***INFINITE WISDOM*** of Microsoft and other Anti-Virus providers, they've marked every executable made with ```PyInstaller``` as a virus instead of improving their virus detection
+  * This software is currently licensed with a standard GPLv3 license which is found in the file ```LICENSE.md``` on this GitHub page.
 
 ## Donate here if you want
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/W7W06AY2V)

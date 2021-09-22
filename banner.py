@@ -1,3 +1,6 @@
+# BanHammer - Mass banning bot tool for Twitch
+# Copyright (C) 2021  Joseph S. Pacheco-Corwin
+
 import re
 import socket
 import time
