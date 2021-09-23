@@ -1,4 +1,4 @@
-# BanHammer v0.2 - A mass-banning tool for Twitch - Now bans at Twitch's speed limit!
+# BanHammer v0.2 - Now bans at Twitch's speed limit!
 ## SPECIAL NOTE
 
 * Windows Defender and other Anti-Virus software ***WILL*** mark ```BanHammer.exe``` as a virus
@@ -16,9 +16,9 @@
 - Added a dirty hack to reconnect when Twitch dilently disconnects the program
 
 #### Fixed
+- Fixed slow ban-rate, it's now the maximum allowed by Twitch
 - Fixed ```config.txt``` parsing to handle leading whitespace better
 - Fixed disconnect function
-- <span style="color:limegreen">Fixed slow ban-rate, it's now the maximum allowed by Twitch</span>
 
 ### v0.1 - 9/21/2021
 - Initial release
